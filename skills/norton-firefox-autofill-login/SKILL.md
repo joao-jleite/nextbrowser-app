@@ -27,8 +27,15 @@ automation path when managed controls are unavailable.
 
 ## Workflow
 
-1. Confirm the selected runtime is Firefox/Camoufox and the current session has
-   passed the required NextBrowser verification. Confirm the target hostname and
+1. Confirm the selected runtime is Firefox/Camoufox and obtain a finalized,
+   passing NextBrowser verification result for this exact session before reading
+   or acting on the website. A running status alone is not verification. If the
+   result is unavailable, call the managed `verify` tool for the selected profile.
+   Preserve the target tab: the runtime may create and close temporary diagnostic
+   tabs for its required checks. This is session verification, not a change of
+   the requested login website; do not navigate the target tab to another site.
+   If necessary, reactivate the original target tab after verification. Stop on
+   failed, incomplete, or unsupported verification. Confirm the target hostname and
    a visible username/password, username-only, or password-only sign-in form.
    Navigate only to a site the user requested. If there is no recognizable login
    form, report `no_login_form_found`.
@@ -40,6 +47,12 @@ automation path when managed controls are unavailable.
    derive an extension URL or access extension storage/background APIs.
    Norton 8.3 displays its in-field panel in an extension iframe. A page snapshot
    that lists only the website's controls does not prove the panel is absent.
+   The panel can appear after the opening action returns. Wait for the managed
+   page to settle and request fresh state. If that snapshot still contains only
+   website controls, allow one additional bounded settle (up to five seconds)
+   and fresh state before deciding that extension controls are unavailable.
+   A saved-item button with the intended neutral label is an exposed Norton
+   control; do not report an inaccessible iframe when that button is available.
    Inspect the visible Norton panel without exposing credential fields. If the
    backend cannot target its controls, report `autofill_failed` rather than
    submitting the website form or using a native desktop fallback.
@@ -57,10 +70,19 @@ automation path when managed controls are unavailable.
      matching URL themselves. Never search the vault for credential values.
 4. For a single intended match, use only an observed Norton action that fills
    the current form. For fill-only, first confirm the action does not submit or
-   navigate. If automatic submission cannot be ruled out, stop with
+   navigate. Verified on GitHub with Norton 8.3.1.1495: choosing the matching
+   saved-item button in the in-field Norton panel fills both required fields
+   and leaves `github.com/login` unsubmitted. The website's **Sign in** is a
+   separate action. The saved-item button uses its item label, not necessarily
+   the word "Fill". Use this verified in-field action for the same workflow;
+   **Open Web App** opens the vault and is not the fill action. For an unfamiliar
+   action whose automatic submission cannot be ruled out, stop with
    `autofill_failed`; never experiment with a sign-in action on the user's behalf.
    Do not alter vault or item settings to make this possible.
-5. Check only visible masked/populated-state indicators. Never inspect input
+5. Check only masked/populated-state indicators. On required fields, the boolean
+   `required` and `validity.valueMissing` properties can confirm a nonempty
+   state without reading `.value`; use this only if the field is actually required.
+   A false `valueMissing` on an optional field proves nothing. Never inspect input
    values, reveal a password, copy credentials, capture the full form DOM, or
    include credential fields in screenshots or transcripts. If filling succeeds
    and the request is fill-only, report `filled_only`. Do not click Sign in, Next,
