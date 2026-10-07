@@ -1,5 +1,5 @@
 ---
-name: norton-firefox-autofill-login
+name: norton-autofill-login-firefox
 description: Fill a website's current sign-in form with a saved Norton Password Manager login in a NextBrowser-managed Firefox/Camoufox profile. Use when the user asks to sign in with Norton or fill saved credentials without submitting, including locked-vault, multiple-login, and second-factor cases.
 ---
 
@@ -24,6 +24,18 @@ the intended website login. Account creation, vault setup, imports, and credenti
 changes are not part of this skill. Use a verified managed session and the
 NextBrowser backend; do not substitute another browser or an operating-system
 automation path when managed controls are unavailable.
+
+### Setup and compatibility
+
+Use a dedicated NextBrowser-managed Camoufox profile with only Norton Password
+Manager installed from Mozilla's official add-on listing. The user signs into
+Norton, creates or unlocks the vault, and saves their own test logins before Run.
+Observed setup: Camoufox 156.0.1-beta.34, Camoufox Python 0.5.7, and Norton
+8.3.1.1495. Native autofill was observed on GitHub, Google, and personal Microsoft
+sign-in forms; Microsoft stopped at email verification. Other versions and
+enterprise Microsoft flows were not validated. This is UI-only integration:
+no supported Norton autofill API, CLI, or Firefox shortcut was used or validated.
+The tested launcher required the extension-tab option described in Recovery.
 
 ## Workflow
 
@@ -89,8 +101,9 @@ automation path when managed controls are unavailable.
    Continue, Submit, or press Enter.
 6. For an authorized full login, inspect the current page before clicking its
    sign-in control once. If Norton already caused navigation, inspect the result
-   instead of submitting again. On a split-page login, identify the newly shown
-   password form and repeat the native fill selection for that step. Advance
+   instead of submitting again. On Google and Microsoft identifier-first forms,
+   use the page's own **Next** control, identify the newly shown password form,
+   and repeat the native Norton fill selection for that step. Advance
    only within the user's requested sign-in flow.
 7. After submission, check for these states before declaring success:
    - Verification code, device/email confirmation, authenticator approval, or

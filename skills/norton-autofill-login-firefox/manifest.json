@@ -1,5 +1,5 @@
 {
-  "id": "norton-firefox-autofill-login",
+  "id": "norton-autofill-login-firefox",
   "name": "Norton Firefox Autofill Login",
   "description": "Fill a saved Norton Password Manager login into the current sign-in form in Firefox/Camoufox.",
   "author": "joao-jleite",
